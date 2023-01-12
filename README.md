@@ -1,5 +1,42 @@
 # mutex-go
 
+## Example of mutex management with decorator pattern.
+
+First we need to create two tests that can run in paralel and access to the same resource (Book's name):
+
+```go
+func TestMutex(t *testing.T) {
+	b := library.CreateBook()
+
+	t.Run("Change books's name", func(t *testing.T) {
+		t.Parallel()
+
+		for i := 0; i < 1000000; i++ {
+			b.ChangeName("test")
+		}
+	})
+
+	t.Run("Get Book's name", func(t *testing.T) {
+		t.Parallel()
+
+		for i := 0; i < 1000000; i++ {
+			b.Name()
+		}
+	})
+}
+```
+
+Method `CreateBook` simply return an instance of `DefaultBook` struct :
+
+```go
+func CreateBook() Book {
+	return &DefaultBook{}
+}
+```
+
+We run them in paralel with the command : `go test --race ./...`
+And here it the error :
+
 ```
 WARNING: DATA RACE
 Write at 0x00c00011a530 by goroutine 8:
@@ -50,4 +87,21 @@ Goroutine 9 (running) created at:
 FAIL
 FAIL    library 0.452s
 FAIL
+```
+
+One goroutine changes the book's name while another reads it.
+It fails !
+
+Change `CreateBook` to return an instance of MutexBook :
+
+```go
+func CreateBook() Book {
+	return &MutexBook{original: DefaultBook{}}
+}
+```
+
+The test doesn't fail anymore :
+
+```
+ok      library 1.430s
 ```

@@ -8,7 +8,7 @@ import (
 func TestMutex(t *testing.T) {
 	b := library.CreateBook()
 
-	t.Run("Set identity", func(t *testing.T) {
+	t.Run("Change books's name", func(t *testing.T) {
 		t.Parallel()
 
 		for i := 0; i < 1000000; i++ {
@@ -16,7 +16,7 @@ func TestMutex(t *testing.T) {
 		}
 	})
 
-	t.Run("Get identity", func(t *testing.T) {
+	t.Run("Get Book's name", func(t *testing.T) {
 		t.Parallel()
 
 		for i := 0; i < 1000000; i++ {
